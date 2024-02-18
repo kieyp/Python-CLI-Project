@@ -23,6 +23,118 @@ class Factory(Base):
     managers = relationship("Manager", back_populates="factory")
     employees = relationship('Employee', back_populates="factory")
     shifts = relationship("Shift", back_populates="factory")
+    
+    
+    def add_manager(self, first_name, last_name, gender, email, employee_no, salary_type, salary_amount, job_title, role):
+        new_manager = Manager(first_name=first_name, last_name=last_name, gender=gender, email=email, employee_no=employee_no,
+                              salary_type=salary_type, salary_amount=salary_amount, job_title=job_title, role=role)
+        self.managers.append(new_manager)
+        return new_manager
+
+    def add_employee(self, first_name, last_name, gender, email, employee_no, salary_type, salary_amount, job_title, role):
+        new_employee = Employee(first_name=first_name, last_name=last_name, gender=gender, email=email, employee_no=employee_no,
+                                salary_type=salary_type, salary_amount=salary_amount, job_title=job_title, role=role)
+        self.employees.append(new_employee)
+        return new_employee
+
+    def add_shift(self, shift_name, shift_supervisor):
+        new_shift = Shift(shift_name=shift_name, shift_supervisor=shift_supervisor)
+        self.shifts.append(new_shift)
+        return new_shift
+
+    def list_employees(self):
+        return self.employees
+
+    def list_managers(self):
+        return self.managers
+
+    def list_shifts(self):
+        return self.shifts
+
+    def find_employee_by_id(self, employee_id):
+        return next((employee for employee in self.employees if employee.id == employee_id), None)
+
+    def find_manager_by_id(self, manager_id):
+        return next((manager for manager in self.managers if manager.id == manager_id), None)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 class Manager(Base):
     __tablename__ = 'managers'
