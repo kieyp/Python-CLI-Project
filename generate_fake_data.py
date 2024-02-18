@@ -1,13 +1,19 @@
 from faker import Faker
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import IntegrityError  # Added for exception handling
+from sqlalchemy.exc import IntegrityError
 from models import Base, Factory, Manager, Employee, Shift
 from datetime import datetime
 import random
+import os
 
 # Create an SQLAlchemy engine to interact with the database
 engine = create_engine('sqlite:///factory_data.db')
+
+# Check if the database file exists
+if not os.path.exists('factory_data.db'):
+    print("Database file 'factory_data.db' does not exist. Please create it.")
+    exit()
 
 # Create all tables in the engine
 Base.metadata.create_all(engine)
