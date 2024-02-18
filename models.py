@@ -59,12 +59,6 @@ class Factory(Base):
     
     
     
-    
-    
-    
-    
-
-    
 
 class Manager(Base):
     __tablename__ = 'managers'
@@ -86,7 +80,32 @@ class Manager(Base):
 
     shifts = relationship("Shift", back_populates="manager")
 
+    def __repr__(self):
+        return f"Manager(id={self.id}, first_name='{self.first_name}', last_name='{self.last_name}', email='{self.email}')"
 
+    def calculate_annual_salary(self):
+        if self.salary_type == "annual":
+            return self.salary_amount
+        elif self.salary_type == "monthly":
+            return self.salary_amount * 12
+        elif self.salary_type == "hourly":
+            return self.salary_amount * 40 * 52
+        else:
+            raise ValueError("Invalid salary type")
+
+    def increase_salary(self, percentage):
+        self.salary_amount *= (1 + percentage / 100)
+
+    def change_salary_type(self, new_salary_type):
+        self.salary_type = new_salary_type
+
+    def view_salary_details(self):
+        return {
+            "salary_type": self.salary_type,
+            "salary_amount": self.salary_amount
+        }
+
+    
 class Employee(Base):
     __tablename__ = 'employees'
     __table_args__ = (UniqueConstraint('email', name='unique_email'),)
@@ -107,6 +126,37 @@ class Employee(Base):
 
     shifts = relationship("Shift", secondary=employee_shift_association, back_populates="employees")
 
+
+    def calculate_annual_salary(self):
+        """Calculate the annual salary of the employee."""
+        if self.salary_type == "annual":
+            return self.salary_amount
+        elif self.salary_type == "monthly":
+            return self.salary_amount * 12
+        elif self.salary_type == "hourly":
+            # Assuming 40 hours per week and 52 weeks per year
+            return self.salary_amount * 40 * 52
+        else:
+            raise ValueError("Invalid salary type")
+
+    def increase_salary(self, percentage):
+        """Increase the employee's salary by a certain percentage."""
+        self.salary_amount *= (1 + percentage / 100)
+
+    def change_salary_type(self, new_salary_type):
+        """Change the salary type of the employee."""
+        self.salary_type = new_salary_type
+
+    def view_salary_details(self):
+        """View detailed information about the employee's salary."""
+        return {
+            "salary_type": self.salary_type,
+            "salary_amount": self.salary_amount
+        }
+
+
+
+
 class Shift(Base):
     __tablename__ = 'shifts'
     id=Column(Integer(),primary_key=True)
@@ -119,3 +169,22 @@ class Shift(Base):
 
     manager_id = Column(Integer, ForeignKey("managers.id"))
     manager = relationship("Manager", back_populates="shifts")
+    
+    
+    
+    
+    
+    def __repr__(self):
+        return f"Shift(id={self.id}, shift_name='{self.shift_name}', shift_supervisor='{self.shift_supervisor}')"
+
+    def add_employee(self, employee):
+        """Add an employee to this shift."""
+        self.employees.append(employee)
+
+    def remove_employee(self, employee):
+        """Remove an employee from this shift."""
+        self.employees.remove(employee)
+
+    def list_employees(self):
+        """List all employees assigned to this shift."""
+        return self.employees
