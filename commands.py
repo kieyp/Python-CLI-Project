@@ -84,6 +84,138 @@ def add_shift(args):
     else:
         print("Factory not found.")
 
+def delete_entity(args):
+    entity_type = input("Enter entity type to delete (employee, manager, shift): ")
+    if entity_type == "employee":
+        delete_employee()
+    elif entity_type == "manager":
+        delete_manager()
+    elif entity_type == "shift":
+        delete_shift()
+    else:
+        print("Invalid entity type.")
+
+def delete_employee():
+    factory_id = input("Enter factory ID: ")
+    employee_id = input("Enter employee ID to delete: ")
+    factory = session.query(Factory).filter_by(id=factory_id).first()
+    if factory:
+        employee = session.query(Employee).filter_by(id=employee_id, factory_id=factory_id).first()
+        if employee:
+            session.delete(employee)
+            session.commit()
+            print("Employee deleted successfully.")
+        else:
+            print("Employee not found in the specified factory.")
+    else:
+        print("Factory not found.")
+
+def delete_manager():
+    factory_id = input("Enter factory ID: ")
+    manager_id = input("Enter manager ID to delete: ")
+    factory = session.query(Factory).filter_by(id=factory_id).first()
+    if factory:
+        manager = session.query(Manager).filter_by(id=manager_id, factory_id=factory_id).first()
+        if manager:
+            session.delete(manager)
+            session.commit()
+            print("Manager deleted successfully.")
+        else:
+            print("Manager not found in the specified factory.")
+    else:
+        print("Factory not found.")
+
+def delete_shift():
+    factory_id = input("Enter factory ID: ")
+    shift_id = input("Enter shift ID to delete: ")
+    factory = session.query(Factory).filter_by(id=factory_id).first()
+    if factory:
+        shift = session.query(Shift).filter_by(id=shift_id, factory_id=factory_id).first()
+        if shift:
+            session.delete(shift)
+            session.commit()
+            print("Shift deleted successfully.")
+        else:
+            print("Shift not found in the specified factory.")
+    else:
+        print("Factory not found.")
+
+def update_entity(args):
+    entity_type = input("Enter entity type to update (employee, manager, shift): ")
+    if entity_type == "employee":
+        update_employee()
+    elif entity_type == "manager":
+        update_manager()
+    elif entity_type == "shift":
+        update_shift()
+    else:
+        print("Invalid entity type.")
+
+def update_employee():
+    factory_id = input("Enter factory ID: ")
+    employee_id = input("Enter employee ID to update: ")
+    factory = session.query(Factory).filter_by(id=factory_id).first()
+    if factory:
+        employee = session.query(Employee).filter_by(id=employee_id, factory_id=factory_id).first()
+        if employee:
+            # Update employee attributes
+            employee.first_name = input("Enter employee's first name: ")
+            employee.last_name = input("Enter employee's last name: ")
+            employee.gender = input("Enter employee's gender: ")
+            employee.email = input("Enter employee's email: ")
+            employee.employee_no = input("Enter employee's employee number: ")
+            employee.salary_type = input("Enter employee's salary type: ")
+            employee.salary_amount = int(input("Enter employee's salary amount: "))
+            employee.job_title = input("Enter employee's job title: ")
+            employee.role = input("Enter employee's role: ")
+            session.commit()
+            print("Employee updated successfully.")
+        else:
+            print("Employee not found in the specified factory.")
+    else:
+        print("Factory not found.")
+
+def update_manager():
+    factory_id = input("Enter factory ID: ")
+    manager_id = input("Enter manager ID to update: ")
+    factory = session.query(Factory).filter_by(id=factory_id).first()
+    if factory:
+        manager = session.query(Manager).filter_by(id=manager_id, factory_id=factory_id).first()
+        if manager:
+            # Update manager attributes
+            manager.first_name = input("Enter manager's first name: ")
+            manager.last_name = input("Enter manager's last name: ")
+            manager.gender = input("Enter manager's gender: ")
+            manager.email = input("Enter manager's email: ")
+            manager.employee_no = input("Enter manager's employee number: ")
+            manager.salary_type = input("Enter manager's salary type: ")
+            manager.salary_amount = int(input("Enter manager's salary amount: "))
+            manager.job_title = input("Enter manager's job title: ")
+            manager.role = input("Enter manager's role: ")
+            session.commit()
+            print("Manager updated successfully.")
+        else:
+            print("Manager not found in the specified factory.")
+    else:
+        print("Factory not found.")
+
+def update_shift():
+    factory_id = input("Enter factory ID: ")
+    shift_id = input("Enter shift ID to update: ")
+    factory = session.query(Factory).filter_by(id=factory_id).first()
+    if factory:
+        shift = session.query(Shift).filter_by(id=shift_id, factory_id=factory_id).first()
+        if shift:
+            # Update shift attributes
+            shift.shift_name = input("Enter shift name: ")
+            shift.shift_supervisor = input("Enter shift supervisor: ")
+            session.commit()
+            print("Shift updated successfully.")
+        else:
+            print("Shift not found in the specified factory.")
+    else:
+        print("Factory not found.")
+
 def list_factories(args):
     factories = session.query(Factory).all()
     factory_data = []
@@ -174,6 +306,14 @@ def main():
     add_shift_parser = subparsers.add_parser("add_shift", help="Add a shift")
     add_shift_parser.set_defaults(func=add_shift)
 
+    # Subcommands for deleting entities
+    delete_entity_parser = subparsers.add_parser("delete_entity", help="Delete an entity")
+    delete_entity_parser.set_defaults(func=delete_entity)
+
+    # Subcommands for updating entities
+    update_entity_parser = subparsers.add_parser("update_entity", help="Update an entity")
+    update_entity_parser.set_defaults(func=update_entity)
+
     # Subcommands for listing entities
     list_factories_parser = subparsers.add_parser("list_factories", help="List all factories")
     list_factories_parser.set_defaults(func=list_factories)
@@ -197,6 +337,8 @@ def main():
         print("6. List Managers")
         print("7. List Employees")
         print("8. List Shifts")
+        print("9. Delete Entity")
+        print("10. Update Entity")
         print("0. Exit")
         
         choice = input("Enter your choice: ")
@@ -229,6 +371,10 @@ def main():
             for shift in shifts:
                 print(shift)
             input("Press Enter to continue...")
+        elif choice == "9":
+            delete_entity(None)
+        elif choice == "10":
+            update_entity(None)
         elif choice == "0":
             break
         else:
