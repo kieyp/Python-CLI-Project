@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from datetime import datetime
 
-engine = create_engine('sqlite:///factory_data.db',echo=True)
+engine = create_engine('sqlite:///factory_data.db', echo=True)
 
 Base = declarative_base()
 
@@ -43,13 +43,13 @@ class Factory(Base):
         return new_shift
 
     def list_employees(self):
-        return self.employees
+        return [employee.__dict__ for employee in self.employees]
 
     def list_managers(self):
-        return self.managers
+        return [manager.__dict__ for manager in self.managers]
 
     def list_shifts(self):
-        return self.shifts
+        return [shift.__dict__ for shift in self.shifts]
 
     def find_employee_by_id(self, employee_id):
         return next((employee for employee in self.employees if employee.id == employee_id), None)
@@ -154,9 +154,6 @@ class Employee(Base):
             "salary_amount": self.salary_amount
         }
 
-
-
-
 class Shift(Base):
     __tablename__ = 'shifts'
     id=Column(Integer(),primary_key=True)
@@ -171,9 +168,8 @@ class Shift(Base):
     manager = relationship("Manager", back_populates="shifts")
     
     
-    
-    
-    
+
+
     def __repr__(self):
         return f"Shift(id={self.id}, shift_name='{self.shift_name}', shift_supervisor='{self.shift_supervisor}')"
 
@@ -187,4 +183,4 @@ class Shift(Base):
 
     def list_employees(self):
         """List all employees assigned to this shift."""
-        return self.employees
+        return [employee.__dict__ for employee in self.employees]
