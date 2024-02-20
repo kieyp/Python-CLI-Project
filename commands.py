@@ -2,6 +2,7 @@ import argparse
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Factory, Manager, Employee, Shift, Base
+from prettytable import PrettyTable
 
 # Create engine and bind to existing database
 engine = create_engine('sqlite:///factory_data.db')
@@ -165,7 +166,11 @@ def update_employee():
             employee.email = input("Enter employee's email: ")
             employee.employee_no = input("Enter employee's employee number: ")
             employee.salary_type = input("Enter employee's salary type: ")
-            employee.salary_amount = int(input("Enter employee's salary amount: "))
+            try:
+                employee.salary_amount = int(input("Enter employee's salary amount: "))
+            except ValueError:
+                print("Salary amount must be an integer.")
+                return
             employee.job_title = input("Enter employee's job title: ")
             employee.role = input("Enter employee's role: ")
             session.commit()
@@ -189,7 +194,11 @@ def update_manager():
             manager.email = input("Enter manager's email: ")
             manager.employee_no = input("Enter manager's employee number: ")
             manager.salary_type = input("Enter manager's salary type: ")
-            manager.salary_amount = int(input("Enter manager's salary amount: "))
+            try:
+                manager.salary_amount = int(input("Enter manager's salary amount: "))
+            except ValueError:
+                print("Salary amount must be an integer.")
+                return
             manager.job_title = input("Enter manager's job title: ")
             manager.role = input("Enter manager's role: ")
             session.commit()
@@ -218,75 +227,84 @@ def update_shift():
 
 def list_factories(args):
     factories = session.query(Factory).all()
-    factory_data = []
+    if not factories:
+        print("No factories found.")
+        return
+    
+    table = PrettyTable()
+    table.field_names = ["ID", "Location", "Type"]
     for factory in factories:
-        factory_data.append({
-            "id": factory.id,
-            "location": factory.location,
-            "type": factory.type
-        })
-    return factory_data
+        table.add_row([factory.id, factory.location, factory.type])
+    print(table)
 
 def list_managers(args):
     factory_id = input("Enter factory ID: ")
+    try:
+        factory_id = int(factory_id)
+    except ValueError:
+        print("Factory ID must be an integer.")
+        return
+
     factory = session.query(Factory).filter_by(id=factory_id).first()
     if factory:
-        manager_data = []
-        for manager in factory.managers:
-            manager_data.append({
-                "id": manager.id,
-                "first_name": manager.first_name,
-                "last_name": manager.last_name,
-                "gender": manager.gender,
-                "start_date": manager.start_date,
-                "email": manager.email,
-                "employee_no": manager.employee_no,
-                "salary_type": manager.salary_type,
-                "salary_amount": manager.salary_amount,
-                "job_title": manager.job_title,
-                "role": manager.role
-            })
-        return manager_data
+        managers = factory.managers
+        if not managers:
+            print("No managers found in the specified factory.")
+            return
+        
+        table = PrettyTable()
+        table.field_names = ["ID", "First Name", "Last Name", "Gender", "Start Date", "Email", "Employee No", "Salary Type", "Salary Amount", "Job Title", "Role"]
+        for manager in managers:
+            table.add_row([manager.id, manager.first_name, manager.last_name, manager.gender, manager.start_date, manager.email, manager.employee_no, manager.salary_type, manager.salary_amount, manager.job_title, manager.role])
+        print(table)
     else:
-        return "Factory not found."
+        print("Factory not found.")
 
 def list_employees(args):
     factory_id = input("Enter factory ID: ")
+    try:
+        factory_id = int(factory_id)
+    except ValueError:
+        print("Factory ID must be an integer.")
+        return
+
     factory = session.query(Factory).filter_by(id=factory_id).first()
     if factory:
-        employee_data = []
-        for employee in factory.employees:
-            employee_data.append({
-                "id": employee.id,
-                "first_name": employee.first_name,
-                "last_name": employee.last_name,
-                "gender": employee.gender,
-                "start_date": employee.start_date,
-                "email": employee.email,
-                "employee_no": employee.employee_no,
-                "salary_type": employee.salary_type,
-                "salary_amount": employee.salary_amount,
-                "job_title": employee.job_title,
-                "role": employee.role
-            })
-        return employee_data
+        employees = factory.employees
+        if not employees:
+            print("No employees found in the specified factory.")
+            return
+        
+        table = PrettyTable()
+        table.field_names = ["ID", "First Name", "Last Name", "Gender", "Start Date", "Email", "Employee No", "Salary Type", "Salary Amount", "Job Title", "Role"]
+        for employee in employees:
+            table.add_row([employee.id, employee.first_name, employee.last_name, employee.gender, employee.start_date, employee.email, employee.employee_no, employee.salary_type, employee.salary_amount, employee.job_title, employee.role])
+        print(table)
     else:
-        return "Factory not found."
+        print("Factory not found.")
 
 def list_shifts(args):
     factory_id = input("Enter factory ID: ")
+    try:
+        factory_id = int(factory_id)
+    except ValueError:
+        print("Factory ID must be an integer.")
+        return
+
     factory = session.query(Factory).filter_by(id=factory_id).first()
     if factory:
-        shift_data = []
-        for shift in factory.shifts:
-            shift_data.append({
-                "id": shift.id,
-                "shift_name": shift.shift_name,
-                "shift_supervisor": shift.shift_supervisor
-            })
-        return shift_data
+        shifts = factory.shifts
+        if not shifts:
+            print("No shifts found in the specified factory.")
+            return
+        
+        table = PrettyTable()
+        table.field_names = ["ID", "Shift Name", "Shift Supervisor"]
+        for shift in shifts:
+            table.add_row([shift.id, shift.shift_name, shift.shift_supervisor])
+        print(table)
     else:
-        return "Factory not found."
+        print("Factory not found.")
 
 def main():
     parser = argparse.ArgumentParser(description="Factory Management System")
@@ -352,25 +370,13 @@ def main():
         elif choice == "4":
             add_shift(None)
         elif choice == "5":
-            factories = list_factories(None)
-            for factory in factories:
-                print(factory)
-            input("Press Enter to continue...")
+            list_factories(None)
         elif choice == "6":
-            managers = list_managers(None)
-            for manager in managers:
-                print(manager)
-            input("Press Enter to continue...")
+            list_managers(None)
         elif choice == "7":
-            employees = list_employees(None)
-            for employee in employees:
-                print(employee)
-            input("Press Enter to continue...")
+            list_employees(None)
         elif choice == "8":
-            shifts = list_shifts(None)
-            for shift in shifts:
-                print(shift)
-            input("Press Enter to continue...")
+            list_shifts(None)
         elif choice == "9":
             delete_entity(None)
         elif choice == "10":
